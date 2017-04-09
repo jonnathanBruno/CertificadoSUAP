@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SuapProject</string>
+    <string name="usuario">Usuário:</string>
+    <string name="senha">Senha:</string>
+    <string name="botao">Acessar</string>
+    <string name="title_activity_principal">Principal</string>
+</resources>
