@@ -1,13 +1,19 @@
 package com.example.jonnathanbruno.suapproject;
 
+import android.content.Context;
+import android.net.Credentials;
 import android.os.Build;
+import android.util.Base64;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -17,9 +23,6 @@ import java.util.Scanner;
 
 public class ServerRequest {
 
-    public void vai(){
-
-    }
 
     public JSONObject requestWebServiceLogin(String serviceUrl,String login,String senha) {
         disableConnectionReuseIfNecessary();
@@ -51,6 +54,44 @@ public class ServerRequest {
             }
         }
         return null;
+    }
+
+
+    public String requestWebServiceDados(String serviceUrl,String token) {
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        String resposta = null;
+        try {
+            URL url = new URL(serviceUrl);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setRequestProperty("content-type","application/json");
+            urlConnection.setRequestProperty("user","20131014040145");
+            urlConnection.setRequestProperty("connection", "keep-alive");
+            urlConnection.setRequestProperty("Authorization","Basic MjAxMzEwMTQwNDAxNDU6bmFydXRvOTlAQA==");
+            urlConnection.setRequestProperty("X-CSRFToken",token);
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            StringBuffer buffer = new StringBuffer();
+            while ((line = reader.readLine()) != null){
+                buffer.append(line);
+            }
+            resposta = buffer.toString();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (urlConnection != null){
+                urlConnection.disconnect();
+            }
+            try {
+                reader.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return resposta;
     }
 
     private static void disableConnectionReuseIfNecessary()	 {

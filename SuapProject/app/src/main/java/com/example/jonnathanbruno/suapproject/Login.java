@@ -23,7 +23,7 @@ public class Login {
         this.senha =  senha;
 
 
-        JSONObject serviceResult = server.requestWebServiceLogin("https://suap.ifrn.edu.br/api/autenticacao/token/",login,senha);
+        JSONObject serviceResult = server.requestWebServiceLogin("https://suap.ifrn.edu.br/api/v2/autenticacao/token/",login,senha);
         if(serviceResult != null){
             return this.token = (String) serviceResult.get("token");
         }else return this.token = "false";

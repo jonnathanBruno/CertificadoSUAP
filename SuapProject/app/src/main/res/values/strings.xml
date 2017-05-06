@@ -2,6 +2,11 @@
     <string name="app_name">SuapProject</string>
     <string name="usuario">Usuário:</string>
     <string name="senha">Senha:</string>
+    <string name="situacao">situacao:</string>
+    <string name="matricula">Matrícula:</string>
+    <string name="situacaoSistema">Situacao Sistema:</string>
+    <string name="campus">Campus:</string>
+    <string name="curso">Curso:</string>
     <string name="botao">Acessar</string>
-    <string name="title_activity_principal">Principal</string>
+    <string name="title_activity_principal">SUAP CERTIFICADO</string>
 </resources>
