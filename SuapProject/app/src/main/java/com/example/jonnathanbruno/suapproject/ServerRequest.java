@@ -57,7 +57,7 @@ public class ServerRequest {
     }
 
 
-    public String requestWebServiceDados(String serviceUrl,String token) {
+    public String requestWebServiceDados(String serviceUrl,String token, String login) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String resposta = null;
@@ -66,9 +66,46 @@ public class ServerRequest {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.setRequestProperty("content-type","application/json");
-            urlConnection.setRequestProperty("user","20131014040145");
+            urlConnection.setRequestProperty("user",login);
             urlConnection.setRequestProperty("connection", "keep-alive");
-            urlConnection.setRequestProperty("Authorization","Basic MjAxMzEwMTQwNDAxNDU6bmFydXRvOTlAQA==");
+            urlConnection.setRequestProperty("Authorization","Basic MjAxMzEwMTQwNDAxNDU6Y2xhcmluaGE5OUBA");
+            urlConnection.setRequestProperty("X-CSRFToken",token);
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            StringBuffer buffer = new StringBuffer();
+            while ((line = reader.readLine()) != null){
+                buffer.append(line);
+            }
+            resposta = buffer.toString();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (urlConnection != null){
+                urlConnection.disconnect();
+            }
+            try {
+                reader.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return resposta;
+    }
+
+    public String requestWebServiceNotasAluno(String serviceUrl,String token, String login) {
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        String resposta = null;
+        try {
+            URL url = new URL(serviceUrl);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setRequestProperty("content-type","application/json");
+            urlConnection.setRequestProperty("user",login);
+            urlConnection.setRequestProperty("connection", "keep-alive");
+            urlConnection.setRequestProperty("Authorization","Basic MjAxMzEwMTQwNDAxNDU6Y2xhcmluaGE5OUBA");
             urlConnection.setRequestProperty("X-CSRFToken",token);
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             reader = new BufferedReader(new InputStreamReader(in));

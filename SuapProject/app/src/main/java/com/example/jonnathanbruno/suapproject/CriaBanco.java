@@ -12,6 +12,12 @@ public class CriaBanco extends SQLiteOpenHelper {
     protected static final String EMAIL = "email";
     protected static final String SENHA = "senha";
     protected static final String TOKEN = "token";
+    protected static final String NOME = "nome";
+    protected static final String MATRICULA = "matricula";
+    protected static final String CURSO = "curso";
+    protected static final String CAMPUS = "campus";
+    protected static final String SITUACAO = "situacao";
+    protected static final String SITUACAO_SISTEMA = "situacaoSistema";
     private static final int VERSAO = 1;
 
     public CriaBanco(Context context, int version) {
@@ -24,14 +30,20 @@ public class CriaBanco extends SQLiteOpenHelper {
                 + ID + " integer primary key autoincrement, "
                 + EMAIL + " text, "
                 + SENHA + " text, "
-                + TOKEN + " text "
+                + TOKEN + " text, "
+                + NOME + " text, "
+                + MATRICULA + " text, "
+                + CURSO + " text, "
+                + CAMPUS + " text, "
+                + SITUACAO + " text, "
+                + SITUACAO_SISTEMA + " text "
                 +" ) ";
         db.execSQL(sql);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS" + TABELA);
+        db.execSQL("DROP TABLE IF EXISTS " + TABELA);
         onCreate(db);
     }
 }

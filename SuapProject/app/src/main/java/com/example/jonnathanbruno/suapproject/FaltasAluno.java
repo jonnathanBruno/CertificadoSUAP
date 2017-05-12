@@ -1,57 +1,45 @@
 package com.example.jonnathanbruno.suapproject;
 
+
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.EditText;
+import android.widget.ListView;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Principal extends AppCompatActivity  implements NavigationView.OnNavigationItemSelectedListener {
+public class FaltasAluno extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
-    private ServerRequest server = new ServerRequest();
     private String token;
     private String login;
-    private TextView matricula;
-    private TextView nome;
-    private TextView curso;
-    private TextView campus;
-    private TextView situacao;
-    private TextView situacaoSistema;
-    private  BancoController crud;
+    private String anoLetivo;
+    private String periodoLetivo;
+    private ServerRequest server = new ServerRequest();
+    private ListView listaFaltas;
+    private List<Disciplina> mDisciplinaList;
+    private FaltaListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_principal);
+        setContentView(R.layout.activity_faltas);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //pegando variaveis
-        matricula = (TextView) findViewById(R.id.matricula);
-        nome = (TextView) findViewById(R.id.nome);
-        curso = (TextView) findViewById(R.id.curso);
-        campus = (TextView) findViewById(R.id.campus);
-        situacao = (TextView) findViewById(R.id.situacao);
-        situacaoSistema = (TextView) findViewById(R.id.situacaoSistema);
-
-        //criando o banco
-        crud = new BancoController(this,4);
 
         //permissão para acessar internet
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -61,33 +49,8 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
         Intent intent = getIntent();
         Bundle params = intent.getExtras();
 
-        if(params!=null)
-        {
-            token = params.getString("token");
-            login = params.getString("login");
-
-            String serviceResult = server.requestWebServiceDados("https://suap.ifrn.edu.br/api/v2/edu/alunos/"+login+"/", token, login);
-            try{
-                JSONObject obj = new JSONObject(serviceResult);
-
-                matricula.setText(obj.getString("matricula"));
-                nome.setText(obj.getString("nome"));
-                curso.setText(obj.getString("curso"));
-                campus.setText(obj.getString("campus"));
-                situacao.setText(obj.getString("situacao"));
-                situacaoSistema.setText(obj.getString("situacao_sistemica"));
-
-            }catch(Exception e){
-                Toast.makeText(getApplicationContext(), "erro", Toast.LENGTH_LONG).show();
-            }
-
-            String resultado;
-            resultado = crud.inserirDadoUsuario(login, token, matricula.getText().toString(), nome.getText().toString(), curso.getText().toString(), campus.getText().toString(), situacao.getText().toString(), situacaoSistema.getText().toString());
-            //Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
-
-            resultado = crud.buscarDadoUsuario(token, this);
-            //Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
-        }
+        token = params.getString("token");
+        login = params.getString("login");
     }
 
     @Override
@@ -125,11 +88,11 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+
         int id = item.getItemId();
 
         if (id == R.id.nav_usuario) {
-            Intent principalTela = new Intent(Principal.this, Principal.class);
+            Intent principalTela = new Intent(FaltasAluno.this, Principal.class);
             Bundle params = new Bundle();
             params.putString("token",token);
             params.putString("login",login);
@@ -137,7 +100,7 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
             startActivity(principalTela);
 
         } else if (id == R.id.nav_notas) {
-            Intent notasSemestreTela = new Intent(Principal.this, NotasSemestre.class);
+            Intent notasSemestreTela = new Intent(FaltasAluno.this, NotasSemestre.class);
             Bundle params = new Bundle();
             params.putString("token",token);
             params.putString("login",login);
@@ -145,7 +108,7 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
             startActivity(notasSemestreTela);
 
         } else if (id == R.id.nav_faltas) {
-            Intent faltasTela = new Intent(Principal.this, FaltasAluno.class);
+            Intent faltasTela = new Intent(FaltasAluno.this, FaltasAluno.class);
             Bundle params = new Bundle();
             params.putString("token",token);
             params.putString("login",login);
@@ -158,5 +121,38 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void faltasAluno(View view){
+        EditText anoLetivoText = (EditText) findViewById(R.id.anoLetivo);
+        EditText periodoLetivoText = (EditText) findViewById(R.id.periodoLetivo);
+
+        anoLetivo = anoLetivoText.getText().toString();
+        periodoLetivo = periodoLetivoText.getText().toString();
+        mDisciplinaList = new ArrayList<>();
+
+        String serviceResult = server.requestWebServiceNotasAluno("https://suap.ifrn.edu.br/api/v2/minhas-informacoes/boletim/"+anoLetivo+"/"+periodoLetivo+"/", token, login);
+        try{
+            JSONArray objArray = new JSONArray(serviceResult);
+            for	(int i = 0;	i <	objArray.length();	i++)	{
+                JSONObject obj = objArray.getJSONObject(i);
+                mDisciplinaList.add(new Disciplina(obj.getInt("codigo_diario"),
+                                                    obj.getString("disciplina"),
+                                                    obj.getInt("numero_faltas"),
+                                                    obj.getInt("percentual_carga_horaria_frequentada")));
+            }
+        }catch(Exception e){
+            Log.d("ERRO", e.toString());
+        }
+
+        listaFaltas = (ListView) findViewById(R.id.textListaFaltas);
+
+        try{
+            //Init adapter
+            adapter = new FaltaListAdapter(this, mDisciplinaList);
+            listaFaltas.setAdapter(adapter);
+        }catch(Exception e){
+            Log.d("ERRO", e.toString());
+        }
     }
 }

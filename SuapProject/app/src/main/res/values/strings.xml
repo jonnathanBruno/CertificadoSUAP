@@ -7,6 +7,14 @@
     <string name="situacaoSistema">Situacao Sistema:</string>
     <string name="campus">Campus:</string>
     <string name="curso">Curso:</string>
+    <string name="dadosAluno">Dados do Aluno</string>
     <string name="botao">Acessar</string>
-    <string name="title_activity_principal">SUAP CERTIFICADO</string>
+    <string name="botaoNotas">Buscar</string>
+    <string name="title_activity_principal">SUAP</string>
+    <string name="action_settings">Settings</string>
+    <string name="anoLetivo">Ano Letivo</string>
+    <string name="periodoLetivo">Período Letivo</string>
+
+    <string name="notaAluno">Notas do Aluno</string>
+    <string name="faltaAluno">Faltas do Aluno</string>
 </resources>

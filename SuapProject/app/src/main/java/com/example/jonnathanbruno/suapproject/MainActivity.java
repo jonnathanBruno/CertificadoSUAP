@@ -19,13 +19,11 @@ public class MainActivity extends AppCompatActivity{
     private Login logar;
     private EditText login;
     private EditText senha;
-    private  BancoController crud;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        crud = new BancoController(this,1);
 
         //permissão para acessar internet
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -41,10 +39,6 @@ public class MainActivity extends AppCompatActivity{
        Object token = logar.logar(login.getText().toString() , senha.getText().toString(), this);
 
         if(token != "false"){
-            //String resultado;
-            //resultado = crud.insereDado(login.getText().toString(), senha.getText().toString(),(String) token);
-            //Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
-
             Intent segundaTela = new Intent(MainActivity.this, Principal.class);
             Bundle params = new Bundle();
             params.putString("token", (String) token);
