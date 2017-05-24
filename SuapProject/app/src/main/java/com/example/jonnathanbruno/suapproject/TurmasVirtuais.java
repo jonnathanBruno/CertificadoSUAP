@@ -1,41 +1,44 @@
 package com.example.jonnathanbruno.suapproject;
 
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Principal extends AppCompatActivity  implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+import java.util.List;
 
-    private ServerRequest server = new ServerRequest();
+public class TurmasVirtuais extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+
+    private String codTurma;
+    private TextView componenteCurricular;
     private String token;
     private String login;
-    private TextView matricula;
-    private TextView nome;
-    private TextView curso;
-    private TextView campus;
-    private TextView situacao;
-    private TextView situacaoSistema;
-    private  BancoController crud;
+    private ServerRequest server = new ServerRequest();
+    private ListView alunos;
+    private List<Aluno> mAlunoList;
+    private AlunoListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_principal);
+        setContentView(R.layout.activity_turmas);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -43,15 +46,10 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
         navigationView.setNavigationItemSelectedListener(this);
 
         //pegando variaveis
-        matricula = (TextView) findViewById(R.id.matricula);
-        nome = (TextView) findViewById(R.id.nome);
-        curso = (TextView) findViewById(R.id.curso);
-        campus = (TextView) findViewById(R.id.campus);
-        situacao = (TextView) findViewById(R.id.situacao);
-        situacaoSistema = (TextView) findViewById(R.id.situacaoSistema);
+        componenteCurricular = (TextView) findViewById(R.id.componenteCurricularListagem);
 
-        //criando o banco
-        crud = new BancoController(this,4);
+        LinearLayout l1 = (LinearLayout) findViewById(R.id.linearGeralTurmasListagem);
+        l1.setVisibility(View.GONE);
 
         //permissão para acessar internet
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -61,33 +59,8 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
         Intent intent = getIntent();
         Bundle params = intent.getExtras();
 
-        if(params!=null)
-        {
-            token = params.getString("token");
-            login = params.getString("login");
-
-            String serviceResult = server.requestWebServiceDados("https://suap.ifrn.edu.br/api/v2/edu/alunos/"+login+"/", token, login);
-            try{
-                JSONObject obj = new JSONObject(serviceResult);
-
-                matricula.setText(obj.getString("matricula"));
-                nome.setText(obj.getString("nome"));
-                curso.setText(obj.getString("curso"));
-                campus.setText(obj.getString("campus"));
-                situacao.setText(obj.getString("situacao"));
-                situacaoSistema.setText(obj.getString("situacao_sistemica"));
-
-            }catch(Exception e){
-                Toast.makeText(getApplicationContext(), "erro", Toast.LENGTH_LONG).show();
-            }
-
-            String resultado;
-            resultado = crud.inserirDadoUsuario(login, token, matricula.getText().toString(), nome.getText().toString(), curso.getText().toString(), campus.getText().toString(), situacao.getText().toString(), situacaoSistema.getText().toString());
-            //Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
-
-            resultado = crud.buscarDadoUsuario(token, this);
-            //Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
-        }
+        token = params.getString("token");
+        login = params.getString("login");
     }
 
     @Override
@@ -117,7 +90,7 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
         //noinspection SimplifiableIfStatement
         if (id == R.id.sair) {
             this.token = "";
-            Intent login = new Intent(Principal.this, MainActivity.class);
+            Intent login = new Intent(TurmasVirtuais.this, MainActivity.class);
             startActivity(login);
         }
 
@@ -127,11 +100,11 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+
         int id = item.getItemId();
 
         if (id == R.id.nav_usuario) {
-            Intent principalTela = new Intent(Principal.this, Principal.class);
+            Intent principalTela = new Intent(TurmasVirtuais.this, Principal.class);
             Bundle params = new Bundle();
             params.putString("token",token);
             params.putString("login",login);
@@ -139,7 +112,7 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
             startActivity(principalTela);
 
         } else if (id == R.id.nav_notas) {
-            Intent notasSemestreTela = new Intent(Principal.this, NotasSemestre.class);
+            Intent notasSemestreTela = new Intent(TurmasVirtuais.this, FaltasAluno.class);
             Bundle params = new Bundle();
             params.putString("token",token);
             params.putString("login",login);
@@ -147,14 +120,14 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
             startActivity(notasSemestreTela);
 
         } else if (id == R.id.nav_faltas) {
-            Intent faltasTela = new Intent(Principal.this, FaltasAluno.class);
+            Intent faltasTela = new Intent(TurmasVirtuais.this, FaltasAluno.class);
             Bundle params = new Bundle();
             params.putString("token",token);
             params.putString("login",login);
             faltasTela.putExtras(params);
             startActivity(faltasTela);
         } else if (id == R.id.nav_turmas) {
-            Intent turmasTela = new Intent(Principal.this, TurmasVirtuais.class);
+            Intent turmasTela = new Intent(TurmasVirtuais.this, TurmasVirtuais.class);
             Bundle params = new Bundle();
             params.putString("token",token);
             params.putString("login",login);
@@ -165,5 +138,54 @@ public class Principal extends AppCompatActivity  implements NavigationView.OnNa
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void turmas(View view){
+
+        EditText codTurmaText = (EditText) findViewById(R.id.codTurma);
+        codTurma = codTurmaText.getText().toString();
+        mAlunoList = new ArrayList<>();
+
+        String serviceResult = server.requestWebServiceTurmasVirtuais("https://suap.ifrn.edu.br/api/v2/minhas-informacoes/turmas-virtuais/"+codTurma+"/", token, login);
+        if(serviceResult != null) {
+
+            try {
+
+                JSONObject obj = new JSONObject(serviceResult);
+
+                LinearLayout l2 = (LinearLayout) findViewById(R.id.linearGeralTurmasListagem);
+                l2.setVisibility(View.VISIBLE);
+
+                componenteCurricular.setText("Cod: "+ obj.getString("id") +" - "+ obj.getString("componente_curricular") + " - Ano e período letivo: " + obj.getString("ano_letivo") +"/"+obj.getString("periodo_letivo"));
+
+
+                JSONArray objArray = new JSONArray(obj.getJSONArray("participantes").toString());
+                for (int i = 0; i < objArray.length(); i++) {
+                    JSONObject objEstudante = objArray.getJSONObject(i);
+                    mAlunoList.add(new Aluno(
+                            objEstudante.getString("matricula"),
+                            objEstudante.getString("foto"),
+                            objEstudante.getString("email"),
+                            objEstudante.getString("nome")));
+                }
+
+
+            } catch (Exception e) {
+                Toast.makeText(this,e.toString() , Toast.LENGTH_LONG).show();
+            }
+
+            alunos = (ListView) findViewById(R.id.textListaTurmas);
+
+            try {
+                //Init adapter
+                adapter = new AlunoListAdapter(this, mAlunoList);
+                alunos.setAdapter(adapter);
+                LinearLayout l = (LinearLayout) findViewById(R.id.linearGeralTurmas);
+                l.setVisibility(View.GONE);
+
+            } catch (Exception e) {
+                Log.d("ERRO", e.toString());
+            }
+        }
     }
 }

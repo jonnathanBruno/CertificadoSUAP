@@ -15,9 +15,9 @@
             android:icon="@drawable/icon_faltas"
             android:title="Visualizar Faltas " />
         <item
-            android:id="@+id/nav_bolsa"
-            android:icon="@drawable/icon_bolsa"
-            android:title="Bolsas Oferecidas" />
+            android:id="@+id/nav_turmas"
+            android:icon="@drawable/icon_turma"
+            android:title="Turmas Virtuais" />
     </group>
 
 

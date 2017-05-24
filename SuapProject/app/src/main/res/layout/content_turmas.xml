@@ -5,24 +5,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.jonnathanbruno.suapproject.FaltasAluno"
+    tools:context="com.example.jonnathanbruno.suapproject.TurmasVirtuais"
     android:orientation="vertical">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp">
-        <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textListaFaltas" />
-    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/linearGeral">
+        android:layout_marginTop="60dp"
+        android:id="@+id/linearGeralTurmasListagem">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="10dp">
+            <TextView
+                android:id="@+id/textView4"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/copCurri" />
+            <TextView
+                android:id="@+id/componenteCurricularListagem"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+        <ListView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textListaTurmas" />
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/linearGeralTurmas">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,13 +62,13 @@
             android:layout_marginTop="70dp">
 
             <TextView
-                android:id="@+id/textDadoAluno"
+                android:id="@+id/textTurmasVirtuais"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="25sp"
                 android:gravity="center_horizontal"
-                android:text="@string/faltaAluno" />
+                android:text="@string/turmas" />
         </LinearLayout>
 
         <LinearLayout
@@ -49,37 +79,14 @@
             android:layout_marginTop="20dp">
 
             <TextView
-                android:id="@+id/textUsuario"
+                android:id="@+id/textCod"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/anoLetivo" />
+                android:text="@string/codTurma" />
 
             <EditText
-                android:id="@+id/anoLetivo"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:inputType="number" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                android:id="@+id/textView1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/periodoLetivo" />
-
-            <EditText
-                android:id="@+id/periodoLetivo"
+                android:id="@+id/codTurma"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:inputType="number" />
@@ -93,13 +100,13 @@
             android:layout_marginTop="20dp">
 
             <Button
-                android:id="@+id/botaoFaltasAluno"
+                android:id="@+id/botaoTurmas"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/screen_border"
                 android:text="@string/botaoNotas"
                 android:textColor="@color/fonteBotão"
-                android:onClick="faltasAluno" />
+                android:onClick="turmas" />
 
         </LinearLayout>
 

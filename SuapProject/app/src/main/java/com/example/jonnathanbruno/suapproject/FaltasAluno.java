@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -78,8 +79,10 @@ public class FaltasAluno extends AppCompatActivity implements NavigationView.OnN
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.sair) {
+            this.token = "";
+            Intent login = new Intent(FaltasAluno.this, MainActivity.class);
+            startActivity(login);
         }
 
         return super.onOptionsItemSelected(item);
@@ -114,8 +117,13 @@ public class FaltasAluno extends AppCompatActivity implements NavigationView.OnN
             params.putString("login",login);
             faltasTela.putExtras(params);
             startActivity(faltasTela);
-        } else if (id == R.id.nav_bolsa) {
-
+        } else if (id == R.id.nav_turmas) {
+            Intent turmasTela = new Intent(FaltasAluno.this, TurmasVirtuais.class);
+            Bundle params = new Bundle();
+            params.putString("token",token);
+            params.putString("login",login);
+            turmasTela.putExtras(params);
+            startActivity(turmasTela);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -132,27 +140,33 @@ public class FaltasAluno extends AppCompatActivity implements NavigationView.OnN
         mDisciplinaList = new ArrayList<>();
 
         String serviceResult = server.requestWebServiceNotasAluno("https://suap.ifrn.edu.br/api/v2/minhas-informacoes/boletim/"+anoLetivo+"/"+periodoLetivo+"/", token, login);
-        try{
-            JSONArray objArray = new JSONArray(serviceResult);
-            for	(int i = 0;	i <	objArray.length();	i++)	{
-                JSONObject obj = objArray.getJSONObject(i);
-                mDisciplinaList.add(new Disciplina(obj.getInt("codigo_diario"),
-                                                    obj.getString("disciplina"),
-                                                    obj.getInt("numero_faltas"),
-                                                    obj.getInt("percentual_carga_horaria_frequentada")));
+        if(serviceResult != null){
+            try{
+                JSONArray objArray = new JSONArray(serviceResult);
+                for	(int i = 0;	i <	objArray.length();	i++)	{
+                    JSONObject obj = objArray.getJSONObject(i);
+                    mDisciplinaList.add(new Disciplina(obj.getInt("codigo_diario"),
+                            obj.getString("disciplina"),
+                            obj.getInt("numero_faltas"),
+                            obj.getInt("percentual_carga_horaria_frequentada")));
+                }
+            }catch(Exception e){
+                Log.d("ERRO", e.toString());
             }
-        }catch(Exception e){
-            Log.d("ERRO", e.toString());
+
+            listaFaltas = (ListView) findViewById(R.id.textListaFaltas);
+
+            try{
+                //Init adapter
+                adapter = new FaltaListAdapter(this, mDisciplinaList);
+                listaFaltas.setAdapter(adapter);
+                LinearLayout one = (LinearLayout) findViewById(R.id.linearGeral);
+                one.setVisibility(View.GONE);
+
+            }catch(Exception e){
+                Log.d("ERRO", e.toString());
+            }
         }
 
-        listaFaltas = (ListView) findViewById(R.id.textListaFaltas);
-
-        try{
-            //Init adapter
-            adapter = new FaltaListAdapter(this, mDisciplinaList);
-            listaFaltas.setAdapter(adapter);
-        }catch(Exception e){
-            Log.d("ERRO", e.toString());
-        }
     }
 }

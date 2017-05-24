@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,8 +83,10 @@ public class NotasSemestre extends AppCompatActivity implements NavigationView.O
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.sair) {
+            this.token = "";
+            Intent login = new Intent(NotasSemestre.this, MainActivity.class);
+            startActivity(login);
         }
 
         return super.onOptionsItemSelected(item);
@@ -118,8 +121,13 @@ public class NotasSemestre extends AppCompatActivity implements NavigationView.O
             params.putString("login",login);
             faltasTela.putExtras(params);
             startActivity(faltasTela);
-        } else if (id == R.id.nav_bolsa) {
-
+        } else if (id == R.id.nav_turmas) {
+            Intent turmasTela = new Intent(NotasSemestre.this, TurmasVirtuais.class);
+            Bundle params = new Bundle();
+            params.putString("token",token);
+            params.putString("login",login);
+            turmasTela.putExtras(params);
+            startActivity(turmasTela);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -136,29 +144,34 @@ public class NotasSemestre extends AppCompatActivity implements NavigationView.O
         mDisciplinaList = new ArrayList<>();
 
         String serviceResult = server.requestWebServiceNotasAluno("https://suap.ifrn.edu.br/api/v2/minhas-informacoes/boletim/"+anoLetivo+"/"+periodoLetivo+"/", token, login);
-        try{
-            JSONArray objArray = new JSONArray(serviceResult);
-            for	(int i = 0;	i <	objArray.length();	i++)	{
-                JSONObject obj = objArray.getJSONObject(i);
-                mDisciplinaList.add(new Disciplina(obj.getInt("codigo_diario"),
-                                                   obj.getString("disciplina"),
-                                                   obj.getJSONObject("nota_etapa_1").getInt("nota"),
-                                                   obj.getJSONObject("nota_etapa_2").getInt("nota"),
-                                                   obj.getInt("media_final_disciplina"),
-                                                   obj.getString("situacao")));
+        if(serviceResult != null) {
+            try {
+                JSONArray objArray = new JSONArray(serviceResult);
+                for (int i = 0; i < objArray.length(); i++) {
+                    JSONObject obj = objArray.getJSONObject(i);
+                    mDisciplinaList.add(new Disciplina(obj.getInt("codigo_diario"),
+                            obj.getString("disciplina"),
+                            obj.getJSONObject("nota_etapa_1").getInt("nota"),
+                            obj.getJSONObject("nota_etapa_2").getInt("nota"),
+                            obj.getInt("media_final_disciplina"),
+                            obj.getString("situacao")));
+                }
+            } catch (Exception e) {
+                Log.d("ERRO", e.toString());
             }
-        }catch(Exception e){
-            Log.d("ERRO", e.toString());
-        }
 
-        listaNotas = (ListView) findViewById(R.id.textListaNotas);
+            listaNotas = (ListView) findViewById(R.id.textListaNotas);
 
-        try{
-            //Init adapter
-            adapter = new DisciplinaListAdapter(this,mDisciplinaList);
-            listaNotas.setAdapter(adapter);
-        }catch(Exception e){
-            Log.d("ERRO", e.toString());
+            try {
+                //Init adapter
+                adapter = new DisciplinaListAdapter(this, mDisciplinaList);
+                listaNotas.setAdapter(adapter);
+                LinearLayout l = (LinearLayout) findViewById(R.id.linearGeralNotas);
+                l.setVisibility(View.GONE);
+
+            } catch (Exception e) {
+                Log.d("ERRO", e.toString());
+            }
         }
     }
 }
